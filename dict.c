@@ -2,10 +2,10 @@
  * CSC 357, Assignment 3
  * Given code, Winter '24 */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "dict.h"
-#define INIT_CAP 30
-
+#include <string.h>
 /* dcthash: Hashes a string key.
  * NOTE: This is certainly not the best known string hashing function, but it
  *       is reasonably performant and easy to predict when testing. */
@@ -23,21 +23,20 @@ static unsigned long int dcthash(char *key) {
  * TODO: Implement this function. It should return a pointer to a newly
  *       dynamically allocated dictionary with an empty backing array. */
 Dict *dctcreate() {
-	
 	Dict *dict; 
 	dict = (Dict *)malloc(sizeof(Dict));
+	dict->cap = 30;
+        dict->size = 0;
 	if (dict == NULL) {
 		free(dict);
 		return NULL;
 	} else {
-		dict -> arr = (Node**)calloc(INIT_CAP, sizeof(Node**));
+		dict -> arr = (Node**)calloc(dict->cap, sizeof(Node**));
 		if (dict->arr == NULL) {
 			free(dict);
 			return NULL;
 		}	
 	}
-	dict->cap = INIT_CAP;
-	dict->size = 0;
 	return dict;
 }
 
@@ -52,10 +51,17 @@ void dctdestroy(Dict *dct) {
 		int i = 0;
 		for (i = 0; i < dct->size; i++) {
 			Node *curr;
-			*curr = dct->arr[i].next;
+			curr = dct->arr[i];
+			while (curr != NULL){
+				Node *next = curr->next;
+				free(curr->key);
+				free(curr);
+				curr = next;
+			}
 		}	
 	}
-	
+	free(dct->arr);
+	free(dct);
     return;
 }
 
@@ -63,7 +69,17 @@ void dctdestroy(Dict *dct) {
  * TODO: Implement this function. It should return the value to which "key" is
  *       mapped, or NULL if it does not exist. */
 void *dctget(Dict *dct, char *key) {
-    return NULL;
+ 	unsigned long int idx = 0;   
+	Node *curr;
+	idx = (dcthash(key))%dct->cap;
+	curr = dct->arr[idx];
+	while (curr != NULL) {
+		if (strcmp(curr->key, key)==0) {
+			return (void*)curr->val;
+		}
+	curr = curr->next;
+	}
+	return NULL;
 }
 
 /* dctinsert: Inserts a key, overwriting any existing value.
@@ -72,47 +88,110 @@ void *dctget(Dict *dct, char *key) {
  *       dynamically allocated copy of "key", rather than "key" itself. Either
  *       implementation is acceptable, as long as there are no memory leaks. */
 void dctinsert(Dict *dct, char *key, void *val) {
-	int idx = 0;
-	idx = (dcthash(key))%INIT_CAP;
+	int loadFactor = 0;
+	unsigned long int idx = 0;
+	Node *curr;
+	Node *node = (Node *)malloc(sizeof(Node));
+	loadFactor = (dct->size) / (dct -> cap);
+	if (loadFactor > 1) {
+		rehash(dct);
+	}
+	node->key = (char *)malloc(strlen(key) + 1);	
+	idx = (dcthash(key))%dct->cap;
 	
-	Node curr*;
 	curr = dct->arr[idx];
 	
 	while (curr != NULL) {
 		if (strcmp(curr->key, key) == 0) {
 		curr->val = val;
-		return;
-		}
-	curr = curr->next;	
-	}
-		
-	Node *node = (Node *)malloc(sizeof(Node));
-	
-	if (node == NULL){
+		free(node->key);
 		free(node);
 		return;
-	} else {
-
-				
+		}
+		curr = curr -> next;
 	}
-	
-	
-return;
+        dct->size = dct->size + 1;
+	strcpy(node->key, key);
+	node -> val = val;
+        node -> next = dct -> arr[idx];
+        dct->arr[idx] = node;	
+	return;
 }
 
-void collision(){
+void rehash(Dict *dct){
+	int i = 0;
+	int oldCap = dct -> cap;
+	Dict *oldDct = dct;
+	Node **oldDict = dct -> arr;
+	dct->cap = oldCap*2 +1;
+
+	dct -> arr = (Node**)calloc(dct->cap, sizeof(Node**));  	
+	
+	for (i = 0; i <oldCap; i++) {
+		Node *curr = oldDict[i];
+		while (curr != NULL) {
+			Node *next = curr->next;
+			unsigned long int idx = dcthash(curr->key)%dct->cap;
+			curr->next = dct->arr[idx];
+            		dct->arr[idx] = curr;
+            		curr = next;
+		}	
+	}
+	dctdestroy(oldDct);
+	return;
 }
+
 
 /* dctremove: Removes a key and the value to which it is mapped.
  * TODO: Implement this function. It should remove "key" and return the value
  *       to which it was mapped, or NULL if it did not exist. */
 void *dctremove(Dict *dct, char *key) {
-    return NULL;
+	unsigned long int idx = 0;
+	int *val = NULL;
+	Node *prev = NULL;
+	Node *curr = NULL;
+        idx = (dcthash(key))%dct->cap;
+	curr = dct->arr[idx];
+
+        while (curr != NULL) {
+                if (strcmp(curr->key, key)==0) {
+                        val = curr -> val;
+			val = (void *)val;
+			if (prev == NULL) {
+				dct->arr[idx] = curr->next;
+			} else {
+				prev->next = curr->next;
+			}
+			dct->size = dct->size - 1;
+			free(curr->key);
+			free(curr);
+			return val;
+                }
+	prev = curr;
+        curr = curr->next;
+        }
+        return NULL;
 }
+
 
 /* dctkeys: Enumerates all of the keys in a dictionary.
  * TODO: Implement this function. It should return a dynamically allocated array
  *       of pointers to the keys, in no particular order, or NULL if empty. */
 char **dctkeys(Dict *dct) {
-    return NULL;
+	char **arr = (char **)malloc(dct->size * sizeof(char *));
+    	int i = 0, k = 0;
+	if ((arr == NULL)||(dct->size == 0)) {
+    		free(arr);
+		return NULL;
+	}
+	for (i=0; i<dct->cap; i++) {
+		Node *curr = dct->arr[i];
+		while (curr != NULL) {
+			arr[k] = curr->key;
+			k++;
+			curr = curr ->next;		
+		}
+	}
+	
+	return arr;
 }
