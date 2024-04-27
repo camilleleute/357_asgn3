@@ -45,25 +45,25 @@ Dict *dctcreate() {
  * TODO: Implement this function. It should deallocate a dictionary, its
  *       backing array, and all of its nodes. */
 void dctdestroy(Dict *dct) {
-	if (dct == NULL){
-		return;
-	} else {
-		int i = 0;
-		for (i = 0; i < dct->size; i++) {
-			Node *curr;
-			curr = dct->arr[i];
-			while (curr != NULL){
-				Node *next = curr->next;
-				free(curr->key);
-				free(curr);
-				curr = next;
-			}
-		}	
+	Node *curr;
+	Node* temp;
+	int i = 0;
+	if (dct == NULL) {
+        	return;
 	}
-	free(dct->arr);
-	free(dct);
-    return;
+	for (i = 0; i < dct->cap; i++) {
+        	curr = dct->arr[i];
+        	while (curr != NULL) {
+            		temp = curr;
+            		curr = curr->next;
+            		free(temp->key);
+            		free(temp);
+        	}
+    	}
+    free(dct -> arr);
+    free(dct);
 }
+
 
 /* dctget: Gets the value to which a key is mapped.
  * TODO: Implement this function. It should return the value to which "key" is
@@ -89,27 +89,31 @@ void *dctget(Dict *dct, char *key) {
  *       implementation is acceptable, as long as there are no memory leaks. */
 void dctinsert(Dict *dct, char *key, void *val) {
 	int loadFactor = 0;
-	unsigned long int idx = 0;
-	Node *curr;
-	Node *node = (Node *)malloc(sizeof(Node));
+        unsigned long int idx = 0;
+        Node *curr, *node;
+	if (dct == NULL || key == NULL) {
+        	return;
+    	}
 	loadFactor = (dct->size) / (dct -> cap);
 	if (loadFactor > 1) {
 		rehash(dct);
 	}
-	node->key = (char *)malloc(strlen(key) + 1);	
-	idx = (dcthash(key))%dct->cap;
 	
+	idx = (dcthash(key))%dct->cap;
 	curr = dct->arr[idx];
 	
 	while (curr != NULL) {
 		if (strcmp(curr->key, key) == 0) {
 		curr->val = val;
-		free(node->key);
-		free(node);
 		return;
 		}
 		curr = curr -> next;
 	}
+	node = (Node *)malloc(sizeof(Node));
+	if (node == NULL) {
+		return;
+	}
+	node->key = (char *)malloc(strlen(key) + 1);
         dct->size = dct->size + 1;
 	strcpy(node->key, key);
 	node -> val = val;

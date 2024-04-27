@@ -10,7 +10,7 @@ debug:
 	gcc -Wall -Wextra -ansi -pedantic -g dict.c
 
 test:
-	gcc -Wall -Wextra -Werror -ansi -pedantic dict.c dicttests.c
+	gcc -Wall -Wextra -Werror -ansi -pedantic -g dict.c dicttests.c
 	./a.out
 
 clean: rm *.o
