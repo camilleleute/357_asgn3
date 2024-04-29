@@ -96,7 +96,7 @@ void dctinsert(Dict *dct, char *key, void *val) {
     	}
 	loadFactor = (dct->size) / (dct -> cap);
 	if (loadFactor > 1) {
-		rehash(dct);
+		(void)rehash(dct);
 	}
 	
 	idx = (dcthash(key))%dct->cap;
@@ -142,7 +142,6 @@ void rehash(Dict *dct){
 	dct->cap = newcap;
 	free(dct->arr);
 	dct->arr = newarr;
-	return;
 }
 
 
