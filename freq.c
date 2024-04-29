@@ -88,7 +88,6 @@ void parse(char *line, Dict* dct) {
 	char *word;
 	word = strtok(line , delimiters);
 	while (word != NULL) {
-		if (checkWord(word) == 0){
 			word = makeWord(word);			
 			val = dctget(dct, word);		
 			if (val != NULL){
@@ -99,7 +98,6 @@ void parse(char *line, Dict* dct) {
 		}	
 		word = strtok(NULL, delimiters);		
 	}
-}
 
 
 int checkWord(char *word) {
