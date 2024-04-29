@@ -33,16 +33,13 @@ int main(int argc, char* argv[]) {
 	}
 	line = (char *)malloc(sizeof(char) * (num + 1));
 	while (fgets(line, num, file) != NULL) {
-                if (1+(unsigned int)strlen(line) == num) {
-                        while (line[num - 1] != '\n' && (1+strlen(line) == num)){
+                while (line[strlen(line)-1] != '\n'){
                                 num = num*2;
                                 line = (char *)realloc(line, sizeof(char) * (num + 1));
                                 fseek(file, -strlen(line), SEEK_CUR);
                                 fgets(line, num, file);
                         }
-                }
-	
-	parse(line, dct);	
+		parse(line, dct);	
 	}
 	pair = malloc(dct->size * sizeof(Pair*));
 	for (j = 0; j < dct->size; j++){
@@ -69,6 +66,7 @@ int main(int argc, char* argv[]) {
 	}
 	free(pair);
 	free(line);
+	free(keys);
 	dctdestroy(dct);	
 	fclose(file);
 	return 0;

@@ -1,1 +1,10 @@
-./freq: Too many arguments
+sed (18)
+et (15)
+eget (13)
+amet (12)
+eu (12)
+sit (12)
+ut (12)
+vitae (12)
+at (11)
+enim (11)

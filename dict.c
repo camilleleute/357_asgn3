@@ -196,6 +196,6 @@ char **dctkeys(Dict *dct) {
 			curr = curr ->next;		
 		}
 	}
-	arr[k] = '\0';
+	/*arr[k] = NULL;*/
 	return arr;
 }
