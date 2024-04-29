@@ -88,28 +88,17 @@ void parse(char *line, Dict* dct) {
 	char *word;
 	word = strtok(line , delimiters);
 	while (word != NULL) {
-			word = makeWord(word);			
-			val = dctget(dct, word);		
-			if (val != NULL){
-				dctinsert(dct, word, (void*)((long)val + 1)); 
-			} else {
-				dctinsert(dct, word, (void*)(long)1);
+			word = makeWord(word);	
+			if (word != NULL) {		
+				val = dctget(dct, word);		
+				if (val != NULL){
+					dctinsert(dct, word, (void*)((long)val + 1)); 
+				} else {
+					dctinsert(dct, word, (void*)(long)1);
+				}	
 			}	
-		}	
-		word = strtok(NULL, delimiters);		
-	}
-
-
-int checkWord(char *word) {
-	int length = strlen(word);
-	int i = 0;
-	for (i = 0; i < length; i++) {
-		if ((isalpha(word[i])==0) && word[i] != '\'' && word[i] != ','&& word[i] !='.'){ 		
-			return 1;
-		}
-	}
-	return 0;
-		
+	word = strtok(NULL, delimiters);		
+	}	
 }
 
 char* makeWord(char* word) {
@@ -118,6 +107,9 @@ char* makeWord(char* word) {
 		if (isalpha(word[i])!=0){
 			word[j++] = tolower(word[i]);
 		}
+	}
+	if (j == 0) {
+		return NULL;		
 	}
 	word[j] = '\0';
 	return word;
