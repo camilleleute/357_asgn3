@@ -23,7 +23,6 @@ void *dctget(Dict *, char *);
 void dctinsert(Dict *, char *, void *);
 void *dctremove(Dict *, char *);
 char **dctkeys(Dict *);
-void rehash(Dict *);
 void parse(char*, Dict *);
 int checkWord(char*);
 int compare(char*, char*);

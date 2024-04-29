@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include "dict.h"
 #include <string.h>
+
+void rehash(Dict *);
 /* dcthash: Hashes a string key.
  * NOTE: This is certainly not the best known string hashing function, but it
  *       is reasonably performant and easy to predict when testing. */
