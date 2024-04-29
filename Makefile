@@ -2,16 +2,16 @@ all: freq
 
 
 freq: freq.o dict.o
-	gcc -o freq freq.o dict.o
+	gcc -g -o freq freq.o dict.o
 
 freq.o: freq.c
-	gcc -Wall -Wextra -Werror -ansi -pedantic -c freq.c
+	gcc -Wall -Wextra -Werror -ansi -pedantic -g -c freq.c
 
 dict: dict.o 
-	gcc -o dict dict.o 
+	gcc -o dict dict.o -g
 
 dict.o: dict.c dict.h
-	gcc -Wall -Wextra -Werror -ansi -pedantic -c dict.c
+	gcc -Wall -Wextra -Werror -ansi -pedantic -g -c dict.c
 
 debug: 
 	gcc -Wall -Wextra -ansi -pedantic -g freq.c

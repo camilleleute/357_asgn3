@@ -24,3 +24,8 @@ void dctinsert(Dict *, char *, void *);
 void *dctremove(Dict *, char *);
 char **dctkeys(Dict *);
 void rehash(Dict *);
+void parse(char*, Dict *);
+int checkWord(char*);
+int compare(char*, char*);
+int comparePair(const void*, const void*);
+char* makeWord(char*);

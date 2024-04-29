@@ -123,25 +123,25 @@ void dctinsert(Dict *dct, char *key, void *val) {
 }
 
 void rehash(Dict *dct){
+	Node **newarr = NULL; 	
 	int i = 0;
-	int oldCap = dct -> cap;
-	Dict *oldDct = dct;
-	Node **oldDict = dct -> arr;
-	dct->cap = oldCap*2 +1;
-
-	dct -> arr = (Node**)calloc(dct->cap, sizeof(Node**));  	
+	int newcap = (dct->cap)*2+1;
+ 	newarr = (Node **)malloc(sizeof(Node *)*newcap);
+	memset(newarr, 0, (newcap)*(sizeof(Node*)));
 	
-	for (i = 0; i <oldCap; i++) {
-		Node *curr = oldDict[i];
+	for (i = 0; i < dct->cap; i++) {
+		Node *curr = dct->arr[i];
 		while (curr != NULL) {
 			Node *next = curr->next;
-			unsigned long int idx = dcthash(curr->key)%dct->cap;
-			curr->next = dct->arr[idx];
-            		dct->arr[idx] = curr;
+			unsigned long int idx = dcthash(curr->key)%newcap;
+            		curr->next = newarr[idx];
+			newarr[idx] = curr;
             		curr = next;
 		}	
 	}
-	dctdestroy(oldDct);
+	dct->cap = newcap;
+	free(dct->arr);
+	dct->arr = newarr;
 	return;
 }
 
@@ -196,6 +196,6 @@ char **dctkeys(Dict *dct) {
 			curr = curr ->next;		
 		}
 	}
-	
+	arr[k] = '\0';
 	return arr;
 }
